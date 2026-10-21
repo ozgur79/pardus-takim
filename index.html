@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pardus Hata Avı</title>
+<meta name="description" content="Bir takımın 2027 Pardus Hata Yakalama ve Öneri Yarışması'na hazırlık sunumu: bulgu döngüsü, kurallar, sınırlar ve yol haritası. Resmî sayfa değildir.">
+<meta name="color-scheme" content="dark">
+<!-- Bilerek dış kaynak yok (font, analitik, CDN): sayfa ziyaretçinin hiçbir verisini üçüncü tarafa göndermez. -->
+<!-- Public sayfa: bulgu, "bakılacak yer", e-posta, kullanıcı adı, private repo adresi bu dosyaya girmez. Anlatıcı notları da kaynakta herkese açıktır. -->
+<style>
+:root{
+  --bg:#0e1519; --bg2:#15212a; --ink:#e8f1f3; --metin:#d3e0e4; --muted:#a2b5bd; --line:#2b3b45;
+  --accent:#4fc8d6; --green:#9fd27e; --red:#f07a66;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  display:flex; flex-direction:column; min-height:100dvh; height:100dvh; overflow:hidden;
+}
+button{
+  font:inherit; font-size:14px; color:inherit; background:transparent; cursor:pointer;
+  border:1px solid var(--line); border-radius:999px; padding:7px 14px; white-space:nowrap;
+}
+button:hover:not(:disabled){border-color:var(--muted)}
+button:disabled{opacity:.35; cursor:default}
+button[aria-pressed="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* Üst şerit */
+header.ust{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px 16px;
+  padding:12px 24px; border-bottom:1px solid var(--line)}
+.marka{display:flex; align-items:center; gap:10px; color:var(--ink); text-decoration:none; font-weight:700; font-size:17px}
+.marka small{color:var(--muted); font-weight:500; font-size:13px}
+.marka svg{width:26px; height:26px; flex:none}
+.araclar{display:flex; gap:6px; flex-wrap:wrap}
+
+/* Sahneler */
+main{position:relative; flex:1; min-height:0}
+.slayt{
+  position:absolute; inset:0; margin:0 auto; max-width:1240px; overflow-y:auto; overflow-x:hidden;
+  display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:20px 48px;
+  align-items:center; align-content:center; align-content:safe center; padding:24px 48px;
+  opacity:0; visibility:hidden; transform:translateY(14px);
+  transition:opacity .5s ease, transform .5s ease, visibility 0s linear .5s;
+}
+.slayt.aktif{opacity:1; visibility:visible; transform:none; transition:opacity .5s ease, transform .5s ease}
+.metin{min-width:0; overflow-wrap:break-word}
+.ust-baslik{color:var(--accent); font-size:13px; font-weight:650; letter-spacing:.14em; text-transform:uppercase; margin-bottom:12px}
+.metin h1,.metin h2{font-size:clamp(26px,3.2vw,42px); line-height:1.1; letter-spacing:-.02em; margin-bottom:16px; text-wrap:balance}
+.metin p,.metin li{font-size:clamp(15px,1.2vw,17px); line-height:1.5; color:var(--metin); max-width:38em}
+.metin p{margin-bottom:10px}
+.metin ul,.metin ol{margin:0 0 12px 1.2em; display:grid; gap:5px}
+.metin ul ul{margin:5px 0 0 1.1em}
+.metin li::marker{color:var(--accent); font-weight:700}
+.metin ul.duz{list-style:none; margin-left:0; gap:3px}
+.metin strong{color:var(--ink)}
+.metin .alt-baslik{color:var(--ink); font-weight:700; margin:4px 0 6px}
+.metin code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace; font-size:.9em; color:var(--accent);
+  background:var(--bg2); border:1px solid var(--line); border-radius:6px; padding:0 .3em; white-space:nowrap}
+.metin .alinti{border-left:3px solid var(--green); padding-left:14px; color:var(--muted)}
+.metin .alinti strong{color:var(--green)}
+.metin .soru{font-size:clamp(19px,1.7vw,24px); line-height:1.35; color:var(--accent); font-weight:650; margin-top:4px}
+.vurgu{color:var(--accent)}
+
+.gorsel{position:relative; justify-self:center; height:min(500px, calc(100dvh - 240px)); aspect-ratio:1; max-width:100%}
+.gorsel svg{position:absolute; inset:0; width:100%; height:100%; border-radius:24px; display:block}
+
+.not{display:none; grid-column:1 / -1; background:var(--bg2); border:1px solid var(--line); border-left:3px solid var(--accent);
+  border-radius:12px; padding:14px 18px; font-size:15px; line-height:1.55; color:var(--muted)}
+.not b{color:var(--ink)}
+.not ul,.not ol{margin:6px 0 0 1.2em; display:grid; gap:4px}
+.not ul ul,.not ul ol{margin-top:4px}
+.not li::marker{color:var(--accent)}
+body.notlar-acik .not{display:block}
+
+/* Alt şerit */
+footer.alt{display:flex; align-items:center; flex-wrap:wrap; gap:8px 10px; padding:10px 24px; border-top:1px solid var(--line)}
+#sayac{font-variant-numeric:tabular-nums; min-width:5em; text-align:center; color:var(--muted); font-size:14px}
+.resmi{flex:1; min-width:0; text-align:center; color:var(--muted); font-size:12px; line-height:1.4}
+.ipucu{color:var(--muted); font-size:13px}
+.ilerleme{height:2px; background:var(--line)}
+.ilerleme span{display:block; height:100%; width:0; background:var(--accent); transition:width .4s ease}
+
+/* Hareketi durdur */
+body.durgun svg *{animation-play-state:paused !important}
+body.durgun .slayt,body.durgun .ilerleme span{transition:none}
+
+@media (max-width:760px){
+  header.ust{padding:10px 16px}
+  .marka small,.ipucu{display:none}
+  button{font-size:13px; padding:6px 11px}
+  .slayt{grid-template-columns:1fr; align-content:start; gap:18px; padding:18px 16px 28px}
+  .gorsel{order:-1; height:min(300px, 36dvh)}
+  footer.alt{padding:8px 16px}
+  .resmi{order:9; flex-basis:100%; font-size:11.5px}
+}
+</style>
+
+<!-- Çizim stilleri ayrı tutulur: "Görseli indir" SVG'yi bu stillerle birlikte dosyaya yazar.
+     Renkler :root'taki tokenların aynısıdır; indirilen SVG tek başına açılabilsin diye burada düz yazılır. -->
+<style id="svg-stil">
+.s-zemin{fill:#16232b}
+.s-cizgi{fill:none;stroke:#e8f1f3;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.s-cizgi-ince{fill:none;stroke:#e8f1f3;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.s-ince{fill:none;stroke:#5b7280;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.s-kesik{stroke-dasharray:4 5}
+.s-kisi{fill:#20313b;stroke:#e8f1f3;stroke-width:3;stroke-linejoin:round}
+.s-ada{fill:#1c2b34;stroke:#5b7280;stroke-width:2}
+.s-serit{fill:#1c2b34}
+.s-etiket{fill:#e4eef0}
+.s-bos{fill:none;stroke:#4fc8d6;stroke-width:3;stroke-dasharray:7 6}
+.s-vurgu{fill:#4fc8d6}
+.s-yesil{fill:#9fd27e}
+.s-koyu{fill:#0b1a20}
+.s-cubuk{fill:#8fa4ad}
+.s-secili{fill:#20313b;stroke:#4fc8d6;stroke-width:3}
+.s-ihtiyac{fill:none;stroke:#4fc8d6;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.s-yardim{fill:none;stroke:#9fd27e;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.s-cizik{stroke:#f07a66;stroke-width:6;stroke-linecap:round}
+.s-cukur{fill:none;stroke:#f07a66;stroke-width:3;stroke-dasharray:6 5}
+.s-disli{fill:none;stroke:#9fd27e;stroke-width:8;stroke-dasharray:5.34 5.34}
+.s-yazi{fill:#e8f1f3;font:600 15px system-ui,-apple-system,"Segoe UI",sans-serif;text-anchor:middle}
+.s-yazi-kucuk{fill:#e8f1f3;font:600 12.5px system-ui,-apple-system,"Segoe UI",sans-serif;text-anchor:middle}
+.s-yazi-k{fill:#0b1a20;font:700 15px system-ui,-apple-system,"Segoe UI",sans-serif;text-anchor:middle}
+.s-yazi-v{fill:#4fc8d6;font:700 14px system-ui,-apple-system,"Segoe UI",sans-serif;text-anchor:middle}
+.s-yazi-y{fill:#9fd27e;font:600 12.5px system-ui,-apple-system,"Segoe UI",sans-serif;text-anchor:middle}
+.s-soluk{fill:#a2b5bd;font:500 13px system-ui,-apple-system,"Segoe UI",sans-serif;text-anchor:middle}
+.s-mono{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace}
+.s-k12{font-size:12px}
+.s-sol{text-anchor:start}
+.s-sag{text-anchor:end}
+.s-hale{paint-order:stroke;stroke:#16232b;stroke-width:5px;stroke-linejoin:round}
+.akis{stroke-dasharray:8 12;animation:s-akis 2.4s linear infinite}
+.nabiz{animation:s-nabiz 2.6s ease-in-out infinite}
+.kay{animation:s-kay 7s ease-in-out infinite}
+.kay-adim{animation:s-kay 8s steps(8,jump-none) infinite}
+@keyframes s-akis{to{stroke-dashoffset:-80}}
+@keyframes s-nabiz{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes s-kay{from{transform:translateX(0)}to{transform:translateX(var(--kay,300px))}}
+</style>
+</head>
+<body>
+
+<header class="ust">
+  <a class="marka" href="#1">
+    <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="11" cy="11" r="7.5" fill="none" stroke="#4fc8d6" stroke-width="2.4"/><path d="M16.6 16.6L23 23" stroke="#e8f1f3" stroke-width="2.8" stroke-linecap="round"/><ellipse cx="11" cy="11.6" rx="2.4" ry="3.1" fill="#e8f1f3"/><path d="M8.2 9.6h-1.6M13.8 9.6h1.6M8.2 13h-1.6M13.8 13h1.6" stroke="#e8f1f3" stroke-width="1.2" stroke-linecap="round"/></svg>
+    Pardus Hata Avı <small>· 2027 hazırlık</small>
+  </a>
+  <div class="araclar">
+    <button id="hareket" type="button" aria-pressed="false">Hareketi durdur Ⅱ</button>
+    <button id="notlar" type="button" aria-pressed="false">Anlatım notları</button>
+    <button id="tamekran" type="button" aria-pressed="false">Tam ekran ↗</button>
+  </div>
+</header>
+
+<main id="sahne">
+
+  <!-- 01 — Neden. Kaynak: YEĞİTEK 14.05.2026 (650.000 bir hedef ifadesi), Pardus ekibinin 2021 değerlendirmesi. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="1 / 11: Neden">
+    <div class="metin">
+      <p class="ust-baslik">01 — Neden</p>
+      <h1>Bir rapor, binlerce ekranda düzeltme</h1>
+      <p>Pardus her gün okullarda açılıyor. MEB, yaklaşık 650.000 etkileşimli tahtanın Pardus altyapısına geçmesini hedefliyor (YEĞİTEK, Mayıs 2026).</p>
+      <p>Bir uygulama takıldığında bunu çok kişi görür, ama pek azı düzgünce anlatır. Pardus ekibi göremediği hatayı düzeltemez.</p>
+      <p><strong>İyi anlatılan sorun ise düzelir.</strong> Yarışmanın ilk yılında, 2021'de değerlendirilen 187 talebin 46'sı uygulanabilir bulundu, 22'si bir sonraki sürüme alındı.</p>
+      <p><strong class="vurgu">Bu yıl o raporların bir kısmını biz yazacağız.</strong></p>
+    </div>
+    <figure class="gorsel" data-sahne="01">
+      <svg viewBox="0 0 400 400" role="img" aria-label="Ekranlardan biri takılıyor; ondan bir rapor iniyor, rapordan çıkan düzeltme bütün ekranlara yayılıyor">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <path class="s-yardim" style="stroke-width:2;opacity:.35" d="M297 277L88 176M300 274L144 177M303 272L200 177M307 271L256 175M310 270L312 177"/>
+        <g class="s-ince"><rect x="65" y="43" width="46" height="28" rx="3"/><rect x="127" y="44" width="34" height="22" rx="2"/><path d="M123 69h42"/><rect x="177" y="43" width="46" height="28" rx="3"/><rect x="233" y="43" width="46" height="28" rx="3"/><rect x="295" y="44" width="34" height="22" rx="2"/><path d="M291 69h42"/><rect x="71" y="79" width="34" height="22" rx="2"/><path d="M67 104h42"/><rect x="121" y="78" width="46" height="28" rx="3"/><rect x="239" y="79" width="34" height="22" rx="2"/><path d="M235 104h42"/><rect x="289" y="78" width="46" height="28" rx="3"/><rect x="65" y="113" width="46" height="28" rx="3"/><rect x="121" y="113" width="46" height="28" rx="3"/><rect x="183" y="114" width="34" height="22" rx="2"/><path d="M179 139h42"/><rect x="233" y="113" width="46" height="28" rx="3"/><rect x="295" y="114" width="34" height="22" rx="2"/><path d="M291 139h42"/><rect x="71" y="149" width="34" height="22" rx="2"/><path d="M67 174h42"/><rect x="121" y="148" width="46" height="28" rx="3"/><rect x="177" y="148" width="46" height="28" rx="3"/><rect x="239" y="149" width="34" height="22" rx="2"/><path d="M235 174h42"/><rect x="289" y="148" width="46" height="28" rx="3"/></g>
+        <rect class="s-vurgu" x="177" y="78" width="46" height="28" rx="3"/>
+        <text class="s-yazi-k nabiz" x="200" y="99" style="font-size:20px">!</text>
+        <path class="s-ihtiyac akis" d="M188 108Q172 110 172 126V204Q172 220 188 222"/>
+        <path class="s-etiket" d="M170 222h46l14 14v54h-60z"/>
+        <path class="s-ince" d="M216 222v14h14M180 250h40M180 262h34M180 274h24"/>
+        <path class="s-yardim akis" d="M234 256Q274 256 290 280"/>
+        <circle class="s-disli" cx="310" cy="290" r="17"/>
+        <circle class="s-yesil" cx="310" cy="290" r="13"/>
+        <circle class="s-zemin" cx="310" cy="290" r="5"/>
+        <text class="s-soluk" x="110" y="262">bir takılma</text>
+        <text class="s-soluk" x="200" y="314">bir rapor</text>
+        <text class="s-soluk" x="310" y="334">herkese düzeltme</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>Salona sor: “Bir bilgisayar uygulaması sizi en son ne zaman sinir etti? Sonra ne yaptınız?” İki kısa cevap al, ayrıntıya girme.</li>
+        <li>Mesaj: Görmek yetmez; sorunu başkasının tekrarlayabileceği kadar açık anlatmak gerekir. Yarışmanın özü bu.</li>
+        <li>650.000 bir hedef ifadesi, gerçekleşmiş bir sayım değil. Öyle söyle.</li>
+        <li>Bu sahne bir alan önermiyor. Alanı toplantının sonunda Emir ve Hakkı seçecek.</li>
+        <li>Kaynaklar: YEĞİTEK duyurusu (14.05.2026) ve Pardus ekibinin 2021 değerlendirmesi. Bilgiler 20.10.2026 itibarıyla.</li>
+        <li>Süre: 1,5 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 02 — Nereden başlıyoruz. Komut ve durum adları repodaki takım kurallarıyla aynı. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="2 / 11: Nereden başlıyoruz">
+    <div class="metin">
+      <p class="ust-baslik">02 — Nereden başlıyoruz</p>
+      <h2>Tek bir bulgudan</h2>
+      <p>Her şey aynı döngüyle işler:</p>
+      <ol>
+        <li><strong>Bul:</strong> Kendi Pardus'unda gör, ekran görüntüsünü al.</li>
+        <li><strong>Kaydet:</strong> Claude Code'a <code>/bulgu</code> yaz. Aynısı var mı diye bakar, eksikleri sana sorar. Bulgu takımın private reposunda kendi klasörüne girer.</li>
+        <li><strong>Tekrarlat:</strong> Takım arkadaşın aynı adımları kendi makinesinde dener (<code>/dogrula</code>). Kendi bulguna <code>/dogrula</code> yok.</li>
+        <li><strong>Panoda gör:</strong> Takım panosu her gönderimde ve her sabah kendiliğinden güncellenir.</li>
+      </ol>
+      <p>Her bulgu aynı hattan geçer: fikir → yeniden-üretildi → rapor-hazır → talep-açıldı. Vazgeçilen bulgu silinmez, gerekçesi yazılarak “elendi” olur.</p>
+      <p>Yarışma boyunca yapacağımız her şey bu döngünün tekrarı olacak; yalnız bulgular ağırlaşacak.</p>
+    </div>
+    <figure class="gorsel" data-sahne="02">
+      <svg viewBox="0 0 400 400" role="img" aria-label="Dört adımlı döngü: bul, kaydet, tekrarlat, panoda gör; bul adımından kenara ayrılan elendi dalı">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <circle class="s-ince" cx="200" cy="205" r="110"/>
+        <path class="s-ihtiyac akis" d="M237.6 101.6A110 110 0 0 1 303.4 167.4"/>
+        <path class="s-ihtiyac akis" d="M303.4 242.6A110 110 0 0 1 237.6 308.4"/>
+        <path class="s-ihtiyac akis" d="M162.4 308.4A110 110 0 0 1 96.6 242.6"/>
+        <path class="s-ihtiyac akis" d="M96.6 167.4A110 110 0 0 1 162.4 101.6"/>
+        <path class="s-ihtiyac" style="stroke-width:3" d="M304.8 157.5L303.4 167.4L295.9 160.7M247.5 309.8L237.6 308.4L244.3 300.9M95.2 252.5L96.6 242.6L104.1 249.3M152.5 100.2L162.4 101.6L155.7 109.1"/>
+        <path class="s-ince s-kesik" d="M173 76Q150 58 124 55"/>
+        <text class="s-soluk s-k12" x="98" y="59">elendi</text>
+        <!-- bul -->
+        <circle class="s-kisi" cx="200" cy="95" r="32"/>
+        <circle class="s-cizgi" style="stroke-width:3.5" cx="195" cy="90" r="11"/>
+        <path class="s-cizgi" d="M203 98l10 10"/>
+        <g class="nabiz">
+          <ellipse class="s-vurgu" cx="248" cy="68" rx="6" ry="8"/><circle class="s-vurgu" cx="248" cy="57" r="4"/>
+          <path class="s-ihtiyac" style="stroke-width:2" d="M242 64h-6M254 64h6M242 71l-6 4M254 71l6 4M246 54l-3-4M250 54l3-4"/>
+        </g>
+        <text class="s-yazi" x="200" y="36">bul</text>
+        <text class="s-soluk s-k12" x="200" y="53">fikir</text>
+        <!-- kaydet -->
+        <circle class="s-kisi" cx="310" cy="205" r="32"/>
+        <rect class="s-koyu" x="284" y="191" width="52" height="30" rx="4" style="stroke:#5b7280;stroke-width:2"/>
+        <text class="s-yazi-v s-mono" x="310" y="210" style="font-size:9.5px">&gt; /bulgu</text>
+        <text class="s-yazi" x="352" y="168">kaydet</text>
+        <!-- tekrarlat -->
+        <circle class="s-kisi" cx="200" cy="315" r="32"/>
+        <rect x="176" y="304" width="21" height="15" rx="2" style="fill:none;stroke:#4fc8d6;stroke-width:2.5"/>
+        <rect x="203" y="304" width="21" height="15" rx="2" style="fill:none;stroke:#9fd27e;stroke-width:2.5"/>
+        <path class="s-cizgi-ince" d="M181 325h11M208 325h11"/>
+        <text class="s-yazi" x="200" y="370">tekrarlat</text>
+        <text class="s-soluk s-k12" x="200" y="387">yeniden-üretildi</text>
+        <!-- panoda -->
+        <circle class="s-kisi" cx="90" cy="205" r="32"/>
+        <rect class="s-etiket" x="74" y="209" width="8" height="11" rx="1.5"/>
+        <rect class="s-etiket" x="86" y="201" width="8" height="19" rx="1.5"/>
+        <rect class="s-yesil" x="98" y="192" width="8" height="28" rx="1.5"/>
+        <path class="s-ince" d="M70 221h40"/>
+        <text class="s-yazi" x="48" y="168">panoda</text>
+        <text class="s-yazi-v" x="200" y="211" style="font-size:18px">1 tur</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>Sunuma kural ya da ödülle değil, bu hafta ne yapacağımızla başlıyoruz.</li>
+        <li>İki terimi tek cümleyle açıkla:
+          <ul>
+            <li>Repo: takımın GitHub'daki ortak klasörü.</li>
+            <li>Claude Code: terminalde çalışan ve repodaki takım kurallarını okuyan yapay zekâ yardımcısı.</li>
+          </ul>
+        </li>
+        <li>Komutları ezberlemek gerekmiyor, ilk hafta birlikte deneyeceğiz. Diğer komutlar sonra gelecek:
+          <ul>
+            <li>/durum: sıradaki adım.</li>
+            <li>/kaynak: hatanın kodda nerede doğduğu.</li>
+            <li>/talep: yalnız talep penceresi açıkken çalışır.</li>
+            <li>/hafta: toplantı gündemi.</li>
+          </ul>
+        </li>
+        <li>Durum adları repoda Türkçe karakter olmadan yazılır: yeniden-uretildi, rapor-hazir, talep-acildi.</li>
+        <li>Panoyu aç. Şu an “Henüz bulgu yok” yazıyor ve talep penceresine kalan günleri sayıyor. Repo adresini ve kullanıcı adlarını ekranda gösterme.</li>
+        <li>Sor: “Bu döngünün en zor adımı sizce hangisi?” Çoğu zaman cevap: tekrarlatmak.</li>
+        <li>Süre: 1,5 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 03 — İlk 7 gün. Kurulum değerleri: Pardus 25.2 (11.09.2026), indir.pardus.org.tr. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="3 / 11: İlk 7 gün">
+    <div class="metin">
+      <p class="ust-baslik">03 — İlk 7 gün</p>
+      <h2>Döngüyü bir kez yaşayalım</h2>
+      <p><strong>Bugün:</strong> alan için ilk tercih, takım adı, haftalık sabit saat.</p>
+      <p class="alt-baslik">1.–3. gün · Kurulum</p>
+      <ul>
+        <li>Pardus 25.2'yi bir sanal makineye ya da boş bir bilgisayara kur. Kalıbı indir.pardus.org.tr'den indir, <code>sha256sum -c</code> ile doğrula.</li>
+        <li>Kurulum biter bitmez “temiz” bir snapshot al. Snapshot, sanal makinenin o anki kaydıdır; her denemeden sonra oraya dönersin.</li>
+        <li>Claude Code'u kur, takım reposuna katıl, <code>/durum</code> yaz.</li>
+      </ul>
+      <p class="alt-baslik">3.–7. gün · İlk av</p>
+      <ul>
+        <li>Herhangi bir Pardus uygulamasında tek bir şey bul; bir yazım hatası bile olur. <code>/bulgu</code> ile kaydet.</li>
+        <li>Emir, Hakkı'nın bulgusunu; Hakkı, Emir'in bulgusunu <code>/dogrula</code> ile tekrarlar.</li>
+      </ul>
+      <p><strong>2. toplantı:</strong> Herkes kendi bulgusunu canlı gösterir.</p>
+    </div>
+    <figure class="gorsel" data-sahne="03">
+      <svg viewBox="0 0 400 400" role="img" aria-label="Sekiz günlük şerit: üç gün kurulum, dört gün ilk av, sekizinci gün ikinci toplantı; altta her denemeden sonra temiz kayda dönen bir sanal makine">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <path class="s-ince" d="M26 46V40H150V46M158 46V40H326V46"/>
+        <text class="s-soluk s-k12" x="88" y="32">kurulum</text>
+        <text class="s-soluk s-k12" x="242" y="32">ilk av</text>
+        <g class="s-ada">
+          <rect x="24" y="52" width="40" height="40" rx="8"/><rect x="68" y="52" width="40" height="40" rx="8"/><rect x="112" y="52" width="40" height="40" rx="8"/>
+          <rect x="156" y="52" width="40" height="40" rx="8"/><rect x="200" y="52" width="40" height="40" rx="8"/><rect x="244" y="52" width="40" height="40" rx="8"/><rect x="288" y="52" width="40" height="40" rx="8"/>
+        </g>
+        <rect class="s-vurgu" x="332" y="52" width="40" height="40" rx="8"/>
+        <!-- disk, fotoğraf makinesi, terminal -->
+        <path class="s-cizgi-ince" d="M34 65a10 3.5 0 0 0 20 0a10 3.5 0 0 0-20 0v13a10 3.5 0 0 0 20 0V65"/>
+        <path class="s-cizgi-ince" d="M77 66h22a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H77a2 2 0 0 1-2-2V68a2 2 0 0 1 2-2zM83 66l2-3h6l2 3"/>
+        <circle class="s-cizgi-ince" cx="88" cy="74" r="4.5"/>
+        <rect class="s-cizgi-ince" x="119" y="62" width="26" height="20" rx="3"/>
+        <path class="s-ihtiyac" style="stroke-width:2" d="M123 68l4 3-4 3M130 76h7"/>
+        <!-- büyüteç ve böcek -->
+        <circle class="s-cizgi-ince" cx="174" cy="70" r="7"/><path class="s-cizgi-ince" d="M179 75l7 7"/>
+        <g><ellipse class="s-vurgu" cx="220" cy="75" rx="5" ry="6.5"/><circle class="s-vurgu" cx="220" cy="66" r="3.2"/><path class="s-ihtiyac" style="stroke-width:1.6" d="M215 72h-5M225 72h5M215 78l-5 3M225 78l5 3"/></g>
+        <circle class="s-cizgi-ince" cx="262" cy="70" r="7"/><path class="s-cizgi-ince" d="M267 75l7 7"/>
+        <g><ellipse class="s-vurgu" cx="308" cy="75" rx="5" ry="6.5"/><circle class="s-vurgu" cx="308" cy="66" r="3.2"/><path class="s-ihtiyac" style="stroke-width:1.6" d="M303 72h-5M313 72h5M303 78l-5 3M313 78l5 3"/></g>
+        <!-- 2. toplantı: iki kişi -->
+        <circle class="s-koyu" cx="344" cy="66" r="5"/><circle class="s-koyu" cx="360" cy="66" r="5"/>
+        <path class="s-koyu" d="M336 84q0-11 8-11t8 11zM352 84q0-11 8-11t8 11z"/>
+        <text class="s-yazi-v s-k12" x="352" y="124">2. toplantı</text>
+        <path class="s-ince s-kesik" d="M44 104H352"/>
+        <circle class="s-vurgu kay-adim" cx="44" cy="104" r="6" style="--kay:308px"/>
+        <!-- temiz snapshot -->
+        <path class="s-cizgi-ince" d="M103 150h22a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-22a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2zM109 150l2-3h6l2 3"/>
+        <circle class="s-cizgi-ince" cx="114" cy="158" r="4.5"/>
+        <text class="s-yazi-y s-sol" x="134" y="163">temiz</text>
+        <rect class="s-kisi" x="90" y="180" width="220" height="130" rx="10"/>
+        <path class="s-ince" d="M90 200H310"/>
+        <circle class="s-cubuk" cx="103" cy="190" r="3.5"/><circle class="s-cubuk" cx="115" cy="190" r="3.5"/><circle class="s-cubuk" cx="127" cy="190" r="3.5"/>
+        <path class="s-vurgu nabiz" d="M200 226l5 15 15 5-15 5-5 15-5-15-15-5 15-5z"/>
+        <text class="s-soluk s-k12" x="200" y="292">deneme</text>
+        <path class="s-yardim akis" style="stroke-width:5" d="M312 222C372 222 372 290 320 290"/>
+        <path class="s-yesil" d="M322 280L309 290L322 300Z"/>
+        <text class="s-soluk" x="200" y="345">her denemeden sonra temiz hâle dön</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>Tarihleri burada birlikte koyun. Haftalık gün ve saat bu toplantıda seçilir.</li>
+        <li>Kurulum önerisi: 2 vCPU; GNOME için 4 GB, XFCE için 3 GB RAM; 30 GB disk.</li>
+        <li>Kalıp boyutu GNOME'da yaklaşık 3,0 GB, XFCE'de yaklaşık 2,8 GB. SHA256SUMS dosyası kalıbın yanında, aynı dizinde duruyor.</li>
+        <li>Sanallaştırma: Windows'ta VirtualBox; Linux'ta KVM/virt-manager ya da GNOME Boxes.</li>
+        <li>Snapshot neden önemli: Pardus ekibi hatayı temiz bir kurulumda deneyecek. Bu yüzden yeniden üretme her zaman araç kurulmamış, temiz snapshot'ta yapılır.</li>
+        <li>İlk bulgu bilerek küçük tutuluyor. Amaç ilk turu bitirmek ve ilk başarıyı erken görmek.</li>
+        <li>Kurulumda takılmak normal, sessiz kalmak sorun. Takılan beklemeden Özgür'e yazsın.</li>
+        <li>Özgür de döngüyü bir kez gösterebilir. Danışmanın kaydı eğitim amaçlıdır, talebe dönüşmez.</li>
+        <li>Sor: “Sanal makine mi, boş bir bilgisayar mı? Kimin elinde ne var?”</li>
+        <li>Süre: 1,5 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 04 — Oyunun kuralı. Kaynak: 2026 şartnamesi V1.3 (m.4.24, m.7.1, m.7.2). 2027 şartnamesi çıkınca güncellenecek. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="4 / 11: Oyunun kuralı">
+    <div class="metin">
+      <p class="ust-baslik">04 — Oyunun kuralı</p>
+      <h2>On hak, üçü sayılır</h2>
+      <p>İki kategori var:</p>
+      <ul>
+        <li><strong>Öneri/Hata Yakalama:</strong> Kod istenmez; hata ya da öneri bildirilir.</li>
+        <li><strong>Geliştirme:</strong> Kod zorunlu. Yeni yazılım herkese açık bir repoda paylaşılır. Mevcut bir Pardus uygulamasına yapılan iyileştirme github.com/pardus'a PR olarak gönderilir.</li>
+      </ul>
+      <p><strong>2026 kuralı:</strong> Kategori başına en fazla 10 talep girilir; Öneri/Hata'da bunların en az 2'si öneri olmalı. Puana yalnız en yüksek puanlı 3 talep girer. Puanlama önemi, türü ve rapor kalitesini tartar.</p>
+      <p>Pardus ekibinin yeniden üretemediği hata değerlendirmeye alınmaz. Döngüdeki “arkadaşın tekrarlasın” adımı bu yüzden var.</p>
+      <p class="alinti"><strong>Pardus ekibi, 2021:</strong> “Hatanın eksiksiz tanımı, ekran görüntüsü olarak sunumu, çözümü ya da çözüm önerisinin belirtilmiş olması fark yarattı.”</p>
+    </div>
+    <figure class="gorsel" data-sahne="04">
+      <svg viewBox="0 0 400 400" role="img" aria-label="On talep kartı; en uzunu tekrarlanamadığı için çizili ve sıfır sayılıyor, sonraki en güçlü üç kart puan kutusuna giriyor">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <rect class="nabiz" x="85" y="19" width="230" height="70" rx="18" style="fill:none;stroke:#4fc8d6;stroke-width:2"/>
+        <rect class="s-kisi" x="90" y="24" width="220" height="60" rx="14"/>
+        <text class="s-yazi-v" x="200" y="60" style="font-size:17px">puan = en iyi 3</text>
+        <!-- soluk kartlar -->
+        <g style="opacity:.45">
+          <rect class="s-kisi" x="37" y="167" width="46" height="55" rx="5"/>
+          <rect class="s-kisi" x="317" y="177" width="46" height="45" rx="5"/>
+          <rect class="s-kisi" x="37" y="286" width="46" height="70" rx="5"/>
+          <rect class="s-kisi" x="177" y="306" width="46" height="50" rx="5"/>
+          <rect class="s-kisi" x="247" y="316" width="46" height="40" rx="5"/>
+          <rect class="s-kisi" x="317" y="291" width="46" height="65" rx="5"/>
+          <circle class="s-yesil" cx="360" cy="294" r="9"/><text class="s-yazi-k" x="360" y="298" style="font-size:11px">Ö</text>
+        </g>
+        <!-- en iyi 3 -->
+        <rect class="s-secili" x="107" y="127" width="46" height="95" rx="5"/>
+        <rect class="s-secili" x="177" y="122" width="46" height="100" rx="5"/>
+        <rect class="s-secili" x="247" y="137" width="46" height="85" rx="5"/>
+        <circle class="s-yesil" cx="150" cy="130" r="9"/><text class="s-yazi-k" x="150" y="134" style="font-size:11px">Ö</text>
+        <path class="s-ihtiyac akis" d="M130 122V94M200 117V94M270 132V94"/>
+        <path class="s-ihtiyac" style="stroke-width:3" d="M123 99l7-8 7 8M193 99l7-8 7 8M263 99l7-8 7 8"/>
+        <!-- yeniden üretim kapısı -->
+        <rect class="s-kisi" x="107" y="246" width="46" height="110" rx="5"/>
+        <line class="s-cizik" x1="101" y1="246" x2="159" y2="356"/>
+        <text class="s-soluk s-k12" x="130" y="239">tekrarlanamadı → 0</text>
+        <text class="s-soluk s-k12 s-sol" x="37" y="384">10 hak</text>
+        <text class="s-soluk s-k12 s-sag" x="363" y="384">önem · tür · rapor kalitesi</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>2027 şartnamesi 20.10.2026 itibarıyla çıkmadı. Kurallar 2026 metnine göre; şartname çıkınca bu sahne güncellenecek.</li>
+        <li>Sor: “Elimizde 10 orta bulgu mu olsun, 3 güçlü bulgu mu?” Cevabı kuralla bağla: 10 orta bulgu, puanda 3 orta bulgu kadar eder.</li>
+        <li>Çizili kartı göster: En parlak bulgu bile Pardus ekibi tekrarlayamazsa sıfır sayılır.</li>
+        <li>Açık soru: 10 talep sınırı kişi başına mı, takım başına mı?
+          <ul>
+            <li>Şartname bir maddede “her bir kategori için” (m.4.24), başka bir maddede “1 kişi tarafından” (m.7.2.b) diyor.</li>
+            <li>İkinci ifade yarışmanın bireysel olduğu yıllardan kalmış görünüyor.</li>
+            <li>Yazılı cevap gelene kadar en dar okumayla, takım başına 10 talep diye planlıyoruz.</li>
+          </ul>
+        </li>
+        <li>Bir talep yalnız bir kategoride sayılır. Geliştirme'de para ödülü alanın Öneri/Hata talepleri değerlendirme dışı kalır.</li>
+        <li>Tür seçenekleri: fonksiyonel, performans, kullanılabilirlik, güvenlik, yerelleştirme, diğer. Önem seviyeleri: düşük, orta, yüksek, kritik.</li>
+        <li>Jüri ihtiyaç duyarsa çevrim içi sunum isteyebilir. Bu madde şartnameye 2026'da girdi.</li>
+        <li>2026 ödülleri: Öneri/Hata 75.000 / 60.000 / 45.000 TL, Geliştirme 80.000 / 70.000 / 60.000 TL. Ödül takım içinde eşit bölünür. Ödülü öne çıkarma.</li>
+        <li>Süre: 2 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 05 — Bizden önce gidenler. Kişi ve takım adı bilerek yok. Kaynak: TEKNOFEST derece listeleri, Pardus haberleri. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="5 / 11: Bizden önce gidenler">
+    <div class="metin">
+      <p class="ust-baslik">05 — Bizden önce gidenler</p>
+      <h2>“Üniversitelileri geride bıraktılar”</h2>
+      <p>Yarışmada yaşa göre ayrı sıralama yok. İlkokuldan doktoraya herkes aynı listede ve her kategoride 3 derece veriliyor.</p>
+      <ul>
+        <li>2023'te dereceye girenlerin hepsi lise öğrencisiydi. Pardus ekibi onlar için “üniversitelileri geride bıraktılar” diye yazdı.</li>
+        <li>2026'da Öneri/Hata birinciliğini bir meslek lisesi takımı aldı.</li>
+        <li>Aynı yılın dereceleri arasında bir danışman, bir kaptan ve bir üyeden oluşan bir ortaokul takımı vardı. Bizim boyumuzda bir takım.</li>
+        <li>Aynı isimler geri dönüyor: 2023 birincisi 2024'te yine birinci oldu; 2024 üçüncüsü 2025'te birinci oldu.</li>
+      </ul>
+      <p><strong class="vurgu">Kazandıran yaş değil, birikim.</strong></p>
+    </div>
+    <figure class="gorsel" data-sahne="05">
+      <svg viewBox="0 0 400 400" role="img" aria-label="2021'den 2026'ya derece tablosu: 2023'te üç derecenin üçü de lise; 2026'da birinci meslek lisesi, ikinci üç kişilik ortaokul takımı; aynı kişilerin sonraki yıl yeniden birinci olduğunu gösteren oklar">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <text class="s-soluk s-k12" x="200" y="40">2021–2023 tek kategori · 2024–2026 Öneri/Hata</text>
+        <rect class="s-serit" x="46" y="110" width="320" height="20" rx="10"/>
+        <rect class="s-serit" x="46" y="180" width="320" height="20" rx="10"/>
+        <rect class="s-serit" x="46" y="250" width="320" height="20" rx="10"/>
+        <text class="s-soluk s-k12" x="30" y="124">1</text><text class="s-soluk s-k12" x="30" y="194">2</text><text class="s-soluk s-k12" x="30" y="264">3</text>
+        <path class="s-ince" d="M46 304H366M62 304v5M118 304v5M174 304v5M230 304v5M286 304v5M342 304v5"/>
+        <g class="s-soluk s-k12"><text x="62" y="327">2021</text><text x="118" y="327">2022</text><text x="174" y="327">2023</text><text x="230" y="327">2024</text><text x="286" y="327">2025</text><text x="342" y="327">2026</text></g>
+        <g class="s-kisi">
+          <circle cx="62" cy="120" r="10"/><circle cx="62" cy="190" r="10"/><circle cx="62" cy="260" r="10"/>
+          <circle cx="118" cy="120" r="10"/><circle cx="118" cy="190" r="10"/><circle cx="118" cy="260" r="10"/>
+          <circle cx="230" cy="120" r="10"/><circle cx="230" cy="190" r="10"/><circle cx="230" cy="260" r="10"/>
+          <circle cx="286" cy="120" r="10"/><circle cx="286" cy="190" r="10"/><circle cx="286" cy="260" r="10"/>
+          <circle cx="342" cy="260" r="10"/>
+        </g>
+        <g class="s-vurgu"><circle cx="174" cy="120" r="10"/><circle cx="174" cy="190" r="10"/><circle cx="174" cy="260" r="10"/><circle cx="342" cy="120" r="10"/></g>
+        <circle class="s-yesil" cx="342" cy="190" r="10"/>
+        <text class="s-yazi-v" x="174" y="90">üçü de lise</text>
+        <text class="s-soluk s-k12" x="342" y="96">meslek lisesi</text>
+        <text class="s-soluk s-k12" x="342" y="164">ortaokul · 3 kişi</text>
+        <path class="s-ihtiyac akis" style="stroke-width:3" d="M183 112Q202 92 221 112"/>
+        <text class="s-yazi-v s-k12" x="248" y="100">yine</text>
+        <path class="s-yardim akis" style="stroke-width:3" d="M238 252C262 228 262 150 280 128"/>
+        <text class="s-yazi-y s-hale" x="277" y="232">yine</text>
+        <text class="s-soluk" x="200" y="364">aynı kişiler geri dönüyor</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>Kişi ya da takım adı verme.</li>
+        <li>Sor: “Sizce 2023'te liseliler neden kazandı?”</li>
+        <li>Cevaplardan sonra ekle: 2023 birincisi gönüllü platformundaki yazısında kendisini yaklaşık 1,5 yıldır uğraştığı Linux'un ve yazılım ilgisinin kurtardığını yazdı.</li>
+        <li>Vurgu: Bu yıl biz de bir birikim başlatıyoruz. Derece gelmese bile sonraki yıla bir adım önde başlarız.</li>
+        <li>Ortaokul takımıyla ilgili takım–okul eşleşmesi bir gazete haberinden geliyor.</li>
+        <li>2021–2023 arasında tek kategori vardı, 2024'ten beri iki kategori var. Çizimdeki 2024–2026 dereceleri Öneri/Hata kategorisinden.</li>
+        <li>Süre: 1 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 06 — Geçmişten dersler. "Kişiyi anma, dersi söyle." Kaynak: github.com/pardus PR geçmişi, gönüllü platformu yazıları. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="6 / 11: Geçmişten dersler">
+    <div class="metin">
+      <p class="ust-baslik">06 — Geçmişten dersler</p>
+      <h2>Kazandıran alışkanlıklar, kaybettiren kestirmeler</h2>
+      <p class="alt-baslik">İşe yarayan:</p>
+      <ul>
+        <li><strong>Temiz kanıt.</strong> 2023 üçüncüsü bulgularını sıfırdan kurduğu bir sanal makinede, video ve ekran görüntüsüyle raporladı.</li>
+        <li><strong>Kod okumak.</strong> Derece alanlardan ve finalistlerden birkaçı bulgusunu kaynak kodu ya da git geçmişini okurken buldu.</li>
+        <li><strong>Küçük, tek konulu değişiklik.</strong> +2/−1 satırlık bir düzeltme aynı gün kabul edildi.</li>
+      </ul>
+      <p class="alt-baslik">Kaybettiren:</p>
+      <ul>
+        <li><strong>“Zaten düzeltildi.”</strong> Bakımcıların en sık ret sebebi bu. GitHub, Pardus'un iç deposuyla eş zamanlı değil; bu yüzden önce kurulu sürüm karşılaştırılır.</li>
+        <li><strong>Büyük, dağınık değişiklik.</strong> +1255 satırlık bir PR testleri geçemedi ve reddedildi.</li>
+        <li><strong>Son haftaya kalmak.</strong> İzini sürebildiğimiz kazananlarda iş son 4–8 haftaya yığılmış. Erken başlamak bize avantaj sağlayabilir.</li>
+      </ul>
+    </div>
+    <figure class="gorsel" data-sahne="06">
+      <svg viewBox="0 0 400 400" role="img" aria-label="Bulgunun kabule giden yolunda üç çukur: zaten düzeltildi, büyük PR, son hafta; her çukurun üstünde köprü: sürümü karşılaştır, küçük ve tek konu, erken başla">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <g transform="translate(0 28)">
+        <!-- kanıt: temiz VM -->
+        <rect class="s-kisi" x="34" y="62" width="40" height="30" rx="6"/>
+        <path class="s-kisi" d="M74 70l12-6v26l-12-6z"/>
+        <path class="s-vurgu" d="M48 69l12 8-12 8z"/>
+        <text class="s-soluk s-k12" x="58" y="114">temiz VM</text>
+        <path class="s-ince s-kesik" d="M54 122Q34 176 30 228"/>
+        <!-- yol ve çukurlar -->
+        <path class="s-cizgi" style="stroke-width:6" d="M24 240H60M100 240H176M216 240H286M326 240H352"/>
+        <path class="s-cukur" d="M60 240A20 20 0 0 0 100 240M176 240A20 20 0 0 0 216 240M286 240A20 20 0 0 0 326 240"/>
+        <path class="s-yardim" d="M56 240Q80 204 104 240M172 240Q196 204 220 240M282 240Q306 204 330 240"/>
+        <text class="s-yazi-y s-hale" x="80" y="196" style="font-size:12px">sürümü karşılaştır</text>
+        <text class="s-yazi-y s-hale" x="196" y="196" style="font-size:12px">küçük, tek konu</text>
+        <text class="s-yazi-y s-hale" x="306" y="196" style="font-size:12px">erken başla</text>
+        <text class="s-soluk s-k12" x="80" y="280">zaten düzeltildi</text>
+        <text class="s-soluk s-k12" x="196" y="280">büyük PR</text>
+        <text class="s-soluk s-k12" x="306" y="280">son hafta</text>
+        <!-- kabul bayrağı -->
+        <path class="s-cizgi" style="stroke-width:3" d="M358 240V194"/>
+        <path class="s-yesil" d="M358 194l28 9-28 9z"/>
+        <text class="s-soluk s-k12" x="362" y="262">kabul</text>
+        <text class="s-soluk s-k12" x="34" y="262">bulgu</text>
+        <circle class="s-vurgu kay" cx="32" cy="240" r="9" style="--kay:316px"/>
+        </g>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>PR örnekleri Geliştirme tarafından. Öneri/Hata'da kod istenmiyor ama ders aynı: küçük, net, tek konu.</li>
+        <li>“Zaten düzeltildi”yi önlemek basit: Kendi makinendeki paket sürümünü GitHub'daki son sürümle karşılaştırırsın. İlk haftalarda birlikte deneyeceğiz.</li>
+        <li>Diğer ret sebepleri:
+          <ul>
+            <li>uygulamanın amacı dışında kalan büyük özellik,</li>
+            <li>test edilmemiş kod,</li>
+            <li>İngilizce olmayan commit mesajı,</li>
+            <li>kodda Türkçe yorum,</li>
+            <li>force-push.</li>
+          </ul>
+        </li>
+        <li>github.com/pardus'a dışarıdan gelen kod PR'larının %44'ü birleşmiş. Yani küçük ve düzgün katkı gerçekten kabul görüyor.</li>
+        <li>Son haftaya yığılma örnekleri:
+          <ul>
+            <li>2023 birincisi asıl işe sürenin bitmesine yaklaşık 1 ay kala odaklandığını yazdı.</li>
+            <li>2026 Geliştirme birincisinin reposu kapanışa 33 gün kala açıldı; 96 commit'in 25'i son 5 günde atıldı.</li>
+          </ul>
+        </li>
+        <li>“Erken başlamak avantaj” bizim çıkarımımız, bir kural değil.</li>
+        <li>Kaynaklar: github.com/pardus PR geçmişi (20.10.2026 taraması), gonullu.pardus.org.tr'deki katılımcı yazıları.</li>
+        <li>Sor: “Bunlardan hangisine en kolay düşeriz?”</li>
+        <li>Süre: 1,5 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 07 — Claude ile çalışmak. Kaynak: Anthropic (Ocak 2026, 52 kişi), PNAS 2025, MIT Missing Semester 2026. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="7 / 11: Claude ile çalışmak">
+    <div class="metin">
+      <p class="ust-baslik">07 — Claude ile çalışmak</p>
+      <h2>Claude açıklar, sen yazarsın</h2>
+      <p>Bir Pardus bakımcısının yorumu: “<span lang="en">The bug claude has detected is correct, but the solution is not.</span>” Yani hata doğru, çözüm yanlış. Bakımcılar yapay zekâyla (YZ) üretilmiş kodu açıkça reddediyor.</p>
+      <p>İş bölümümüz:</p>
+      <ul>
+        <li>Claude kod okur, kavram anlatır, sorularını cevaplar, raporunu toparlamana yardım eder.</li>
+        <li>Bulguyu sen bulursun ve kendi Pardus'unda görürsün.</li>
+        <li>Pardus'a gidecek kodu ve kanıtı sen yazarsın; her satırını savunabilmelisin.</li>
+        <li>Her raporda bir bölüm olur: “YZ ne yaptı, ben ne yaptım.”</li>
+      </ul>
+      <p>Anthropic'in Ocak 2026 deneyinde yeni bir kütüphaneyi YZ yardımıyla öğrenen grup sınavda %50, elle kodlayan grup %67 aldı. En büyük fark hata ayıklama sorularındaydı.</p>
+    </div>
+    <figure class="gorsel" data-sahne="07">
+      <svg viewBox="0 0 400 400" role="img" aria-label="Claude öğrenciye açıklama ve soru verir, Pardus'a bulgu, kod ve kanıtı öğrenci götürür, Claude'dan Pardus'a doğrudan kod gitmez; altta sınav puanı: YZ yardımıyla yüzde 50, elle kodlayan yüzde 67">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <circle class="s-kisi" cx="70" cy="96" r="32"/>
+        <text class="s-yazi-kucuk" x="70" y="100">Claude</text>
+        <circle class="s-kisi" cx="200" cy="96" r="32"/>
+        <text class="s-yazi" x="200" y="101">sen</text>
+        <rect class="s-kisi" x="292" y="72" width="80" height="48" rx="10"/>
+        <text class="s-yazi" x="332" y="101">Pardus</text>
+        <path class="s-yardim akis" style="stroke-width:3" d="M106 96H156"/>
+        <path class="s-yardim" style="stroke-width:3" d="M152 90l8 6-8 6"/>
+        <text class="s-yazi-y" x="134" y="52" style="font-size:12px">açıklama · soru</text>
+        <path class="s-ihtiyac akis" style="stroke-width:6" d="M236 96H280"/>
+        <path class="s-ihtiyac" style="stroke-width:4" d="M276 87l10 9-10 9"/>
+        <text class="s-yazi-v s-k12" x="262" y="52">bulgu · kod · kanıt</text>
+        <path class="s-ince s-kesik" d="M84 126Q200 214 328 125"/>
+        <path class="s-ince" d="M320 125L330 124L325 133"/>
+        <path class="s-cizik" style="stroke-width:5" d="M194 160L214 180M214 160L194 180"/>
+        <text class="s-soluk s-k12" x="204" y="202">doğrudan kod yok</text>
+        <!-- veri: sınav puanı, eksen 0–100 -->
+        <path class="s-ince" style="opacity:.5" d="M104 234H290M104 289H290"/>
+        <path class="s-ince" d="M104 228V344H290"/>
+        <g class="s-soluk s-sag" style="font-size:11px"><text x="98" y="348">0</text><text x="98" y="293">50</text><text x="98" y="238">100</text></g>
+        <path class="s-cubuk" d="M136 344V293a4 4 0 0 1 4-4h40a4 4 0 0 1 4 4v51z"/>
+        <path class="s-vurgu" d="M220 344V274.3a4 4 0 0 1 4-4h40a4 4 0 0 1 4 4V344z"/>
+        <text class="s-yazi" x="160" y="281">%50</text>
+        <text class="s-yazi" x="244" y="262">%67</text>
+        <text class="s-soluk s-k12" x="160" y="362">YZ yardımıyla</text>
+        <text class="s-soluk s-k12" x="244" y="362">elle kodlayan</text>
+        <text class="s-soluk" x="200" y="388" style="font-size:11.5px">Anthropic, Ocak 2026 · 52 yazılımcı · sınav puanı</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>Tonu yasak olarak değil, kullanım kılavuzu olarak kur: Claude ile çok hızlı öğrenebilirsiniz, yeter ki direksiyon sizde olsun.</li>
+        <li>Rakamlar aracı yapan şirketin kendi araştırmasından. Örneklem küçük: 52 yazılımcı.</li>
+        <li>PNAS 2025 çalışması: Türkiye'de yaklaşık 1.000 lise öğrencisi, matematik dersi.
+          <ul>
+            <li>Düz GPT kullanan grup alıştırmada %48 daha iyiydi.</li>
+            <li>YZ kaldırılınca bu grup sınavda kontrol grubundan %17 düşük kaldı.</li>
+            <li>Cevap yerine ipucu veren “Tutor” sürümünü kullananlar kontrol grubuyla aynı düzeydeydi.</li>
+          </ul>
+        </li>
+        <li>MIT Missing Semester 2026: “<span lang="en">Don't use AI as a crutch.</span>” Yani YZ'yi koltuk değneği yapma.</li>
+        <li>Pratik öğüt: Claude'dan cevap değil, ipucu iste.</li>
+        <li>Jüri gerekirse çevrim içi sunum isteyebilir; kendi yazmadığın şeyi savunamazsın.</li>
+        <li>Sor: “Claude'un anlattığı bir şeyi kendi cümlelerinle anlatamıyorsan ne yaparsın?” Beklenen cevap: anlayana kadar sorarım, o zamana kadar yazmam.</li>
+        <li>Süre: 1,5 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 08 — Sert sınırlar. Kaynak: 2026 şartnamesi m.7.1 ve m.12, MEB Bilgi ve Sistem Güvenliği Yönergesi m.11 ve m.16, TEKNOFEST Genel Kurallar 2026. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="8 / 11: Sert sınırlar">
+    <div class="metin">
+      <p class="ust-baslik">08 — Sert sınırlar</p>
+      <h2>Az kural, sert kural</h2>
+      <ul>
+        <li><strong>Uydurma yok.</strong> Görmediğin adımı, sürümü, ekranı yazma; bilmiyorsan “?” koy.</li>
+        <li><strong>İki makine kuralı.</strong> Bulgu, başka bir üyenin makinesinde ve temiz bir kurulumda tekrarlanmadan doğrulanmış sayılmaz.</li>
+        <li><strong>Denemeler yalnız kendi makinelerimizde yapılır.</strong> Canlı sunuculara yük, tarama ya da saldırı denemesi yok.</li>
+        <li><strong>Okul ağında ve tahtalarda güvenlik testi yok.</strong> Tahtada yalnız izinli, normal kullanım düzeyinde gözlem yapılır.</li>
+        <li><strong>Bulgular gizli.</strong> Pencere açılana kadar forum, sosyal medya, herkese açık issue ya da PR yok.</li>
+        <li><strong>Danışman talep girmez.</strong> Fikir ve iş öğrencinindir; Özgür yolu açar.</li>
+        <li><strong>Şifre ve token hiçbir dosyaya yazılmaz.</strong></li>
+      </ul>
+    </div>
+    <figure class="gorsel" data-sahne="08">
+      <svg viewBox="0 0 400 400" role="img" aria-label="Kesikli yeşil çerçeveli alan: içinde aynı hatayı gösteren iki makine ve kilit; dışarıda üstü çizili canlı sunucu, okul ağı ve tahta, herkese açık paylaşım">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <rect class="s-yardim" style="stroke-width:3;stroke-dasharray:9 7" x="90" y="50" width="220" height="210" rx="18"/>
+        <!-- kilit -->
+        <path class="s-cizgi" style="stroke-width:3.5" d="M190 46v-8a10 10 0 0 1 20 0v8"/>
+        <rect class="s-etiket" x="184" y="44" width="32" height="24" rx="4"/>
+        <circle class="s-koyu" cx="200" cy="55" r="3"/>
+        <text class="s-soluk s-k12" x="266" y="36">bulgular içeride</text>
+        <!-- iki makine -->
+        <rect class="s-kisi" x="112" y="94" width="64" height="42" rx="4"/>
+        <path class="s-cizgi-ince" d="M144 136v8M132 144h24"/>
+        <rect class="s-kisi" x="224" y="94" width="64" height="42" rx="4"/>
+        <path class="s-cizgi-ince" d="M256 136v8M244 144h24"/>
+        <g><ellipse class="s-vurgu" cx="144" cy="118" rx="5" ry="6.5"/><circle class="s-vurgu" cx="144" cy="109" r="3.2"/><path class="s-ihtiyac" style="stroke-width:1.6" d="M139 115h-5M149 115h5M139 121l-5 3M149 121l5 3"/></g>
+        <g><ellipse class="s-vurgu" cx="256" cy="118" rx="5" ry="6.5"/><circle class="s-vurgu" cx="256" cy="109" r="3.2"/><path class="s-ihtiyac" style="stroke-width:1.6" d="M251 115h-5M261 115h5M251 121l-5 3M261 121l5 3"/></g>
+        <path class="s-yardim" d="M189 114l7 7 13-15"/>
+        <text class="s-yazi-y" x="200" y="176">iki makine</text>
+        <g class="s-vurgu">
+          <path class="nabiz" d="M104 82l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>
+          <path class="nabiz" style="animation-delay:-.9s" d="M298 82l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>
+          <path class="nabiz" style="animation-delay:-1.7s" d="M122 152l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>
+          <path class="nabiz" style="animation-delay:-.4s" d="M280 152l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>
+        </g>
+        <text class="s-yazi" x="200" y="240">kendi makinelerimiz</text>
+        <!-- dışarı uzanan oklar, çerçevede duruyor -->
+        <path class="s-ihtiyac" style="stroke-width:3" d="M268 189H300M110 212V252M290 212V252"/>
+        <path class="s-cizgi" style="stroke-width:6" d="M310 177V201M98 260H122M278 260H302"/>
+        <!-- canlı sunucu -->
+        <rect class="s-kisi" x="342" y="166" width="28" height="46" rx="3"/>
+        <path class="s-ince" d="M348 178h16M348 190h16M348 202h16"/>
+        <path class="s-cizik" style="stroke-width:5" d="M338 162L374 216M374 162L338 216"/>
+        <text class="s-soluk s-k12" x="354" y="236">canlı sunucu</text>
+        <!-- okul ağı · tahta -->
+        <rect class="s-kisi" x="40" y="300" width="56" height="34" rx="3"/>
+        <path class="s-cizgi-ince" d="M60 292q8-8 16 0M54 286q14-14 28 0"/>
+        <circle cx="68" cy="295" r="2.5" style="fill:#e8f1f3"/>
+        <path class="s-cizik" style="stroke-width:5" d="M38 276L98 338M98 276L38 338"/>
+        <text class="s-soluk s-k12" x="68" y="358">okul ağı · tahta</text>
+        <!-- herkese açık -->
+        <path class="s-kisi" d="M306 288h46a6 6 0 0 1 6 6v20a6 6 0 0 1-6 6h-30l-10 9v-9h-6a6 6 0 0 1-6-6v-20a6 6 0 0 1 6-6z"/>
+        <circle class="s-cizgi-ince" cx="329" cy="304" r="9"/>
+        <path class="s-cizgi-ince" d="M320 304h18M329 295q-6 9 0 18q6-9 0-18"/>
+        <path class="s-cizik" style="stroke-width:5" d="M302 276L360 338M360 276L302 338"/>
+        <text class="s-soluk s-k12" x="331" y="358">herkese açık</text>
+        <text class="s-soluk" x="200" y="388">deneme yalnız içeride</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>Her kuralın nedenini bir cümleyle söyle.</li>
+        <li>Pardus ekibinin yeniden üretemediği hata değerlendirilmez (2026 şartnamesi m.7.1).</li>
+        <li>Canlı sunucu: Geçmişte bir finalist denemesini canlı sunucuda yaptı ve gerçek veriyi etkiledi. Kişiyi anma, yalnız dersi söyle.</li>
+        <li>Okul ağı: MEB Bilgi ve Sistem Güvenliği Yönergesi m.11'e göre:
+          <ul>
+            <li>okul ağında port/ağ taraması ve paket dinleme yasak;</li>
+            <li>kişisel cihaz izinsiz kurum ağına bağlanamaz;</li>
+            <li>MEBNET dışı ağ ve kişisel erişim noktası kullanılamaz.</li>
+          </ul>
+          Aykırılıkta soruşturma açılabilir (m.16). Bu kural sizi korumak için.
+        </li>
+        <li>Gizlilik: Benzer ya da taklit olduğu tespit edilen talepler yarışma dışı kalır (m.12). Pencere açılmadan paylaşılan bulgu bu riske girer. Bu bir ihtiyat, şartnamede ayrıca yazan bir kural değil.</li>
+        <li>Danışman: TEKNOFEST Genel Kurallarına göre danışman eser sahibi sayılmaz. Proje sahibinin danışman olduğu tespit edilirse başvuru geçersiz sayılır.</li>
+        <li>“Bitti” kararını takım adına Özgür verir.</li>
+        <li>Sor: “Bunlardan hangisi sana en zor gelecek?”</li>
+        <li>Süre: 1,5 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 09 — Alanını seç. Alanlar seçenek olarak sunulur, uygulama adı ve hedef bu sayfaya yazılmaz. ETAP 2027'de yeniden teyit edilecek. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="9 / 11: Alanını seç">
+    <div class="metin">
+      <p class="ust-baslik">09 — Alanını seç</p>
+      <h2>Haritanın neresinden başlarsın?</h2>
+      <p>Kapsam (2026 metni): Liderahenk ve Pardus'un güncel sürümündeki Pardus uygulamaları. Seçenekler:</p>
+      <ul>
+        <li><strong>Masaüstü uygulamaları:</strong> Her gün kullanılan araçlar. Çoğu Python ve GTK3 ile yazılmış; çoğu zaman bir sanal makine yeter.</li>
+        <li><strong>Okul ortamı (ETAP):</strong> Tahtaların Pardus sürümü. Şartnamede adı geçmiyor. Forumda “Pardus Ekibi” unvanlı bir hesap Öneri/Hata için “son sürüm ETAP dahildir” yazdı (Haziran 2026). 2027'de yeniden sorulacak.</li>
+        <li><strong>Liderahenk:</strong> Kurum bilgisayarlarını merkezden yöneten sistem. Kurulumu ağır, en az iki sanal makine ister.</li>
+        <li><strong>Yerelleştirme ve erişilebilirlik:</strong> Türkçe metinler, klavye, ekran okuyucu.</li>
+      </ul>
+      <p>Kategori de bir seçim: Öneri/Hata ya da Geliştirme. <strong>Karar sizin;</strong> ikiniz aynı alanı da seçebilirsiniz.</p>
+    </div>
+    <figure class="gorsel" data-sahne="09">
+      <svg viewBox="0 0 400 400" role="img" aria-label="Dört bölgeli harita: masaüstü, okul (ETAP), Liderahenk, yerelleştirme ve erişilebilirlik; ortada henüz dikilmemiş iki iğne ve işaretlenmemiş iki kategori kutusu">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <path class="s-ince s-kesik" d="M160 91H240M160 251H240M95 146V196M305 146V196"/>
+        <rect class="s-ada" x="30" y="36" width="130" height="110" rx="22"/>
+        <rect class="s-ada" x="240" y="36" width="130" height="110" rx="22"/>
+        <rect class="s-ada" x="30" y="196" width="130" height="110" rx="22"/>
+        <rect class="s-ada" x="240" y="196" width="130" height="110" rx="22"/>
+        <!-- masaüstü -->
+        <rect class="s-cizgi-ince" x="71" y="58" width="48" height="32" rx="3"/>
+        <path class="s-cizgi-ince" d="M95 90v8M83 100h24"/>
+        <text class="s-yazi-kucuk" x="95" y="130">masaüstü</text>
+        <!-- okul (ETAP) -->
+        <rect class="s-cizgi-ince" x="268" y="56" width="66" height="38" rx="3"/>
+        <path class="s-ince" d="M278 78q8-10 16 0t16 0"/>
+        <path class="s-cizgi" style="stroke-width:3" d="M326 104l16-16"/>
+        <text class="s-yazi-kucuk" x="305" y="130">okul (ETAP)</text>
+        <!-- Liderahenk -->
+        <rect class="s-cizgi-ince" x="83" y="210" width="24" height="30" rx="3"/>
+        <path class="s-ince" d="M89 218h12M89 226h12M95 240L62 256M95 240L128 256"/>
+        <rect class="s-cizgi-ince" x="48" y="256" width="28" height="18" rx="2"/>
+        <rect class="s-cizgi-ince" x="114" y="256" width="28" height="18" rx="2"/>
+        <text class="s-yazi-kucuk" x="95" y="294">Liderahenk</text>
+        <!-- yerelleştirme · erişilebilirlik -->
+        <text class="s-yazi" x="293" y="250" style="font-size:20px">Aa ç ş</text>
+        <path class="s-cizgi-ince" d="M335 236q6 8 0 16M343 230q10 14 0 28"/>
+        <text class="s-yazi-kucuk" x="305" y="278">yerelleştirme ·</text>
+        <text class="s-yazi-kucuk" x="305" y="294">erişilebilirlik</text>
+        <!-- dikilmemiş iki iğne -->
+        <path class="s-bos" style="stroke-dasharray:5 4;stroke-width:2.5" d="M181 194c-6-9-15-16-15-29a15 15 0 0 1 30 0c0 13-9 20-15 29z"/>
+        <path class="s-bos" style="stroke-dasharray:5 4;stroke-width:2.5" d="M219 194c-6-9-15-16-15-29a15 15 0 0 1 30 0c0 13-9 20-15 29z"/>
+        <text class="s-yazi-v nabiz" x="181" y="170" style="font-size:12.5px">E?</text>
+        <text class="s-yazi-v nabiz" x="219" y="170" style="font-size:12.5px;animation-delay:-1.3s">H?</text>
+        <!-- kategori: ikisi de işaretsiz -->
+        <rect class="s-ince" x="62" y="332" width="128" height="32" rx="16"/>
+        <circle class="s-ince" cx="82" cy="348" r="6"/>
+        <text class="s-yazi-kucuk s-sol" x="96" y="352">Öneri/Hata</text>
+        <rect class="s-ince" x="210" y="332" width="128" height="32" rx="16"/>
+        <circle class="s-ince" cx="230" cy="348" r="6"/>
+        <text class="s-yazi-kucuk s-sol" x="244" y="352">Geliştirme</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>Kararı onlara bırak, sen yalnız soru sor.</li>
+        <li>Seçim için üç yardımcı soru:
+          <ol>
+            <li>Bu ortama erişimim var mı?</li>
+            <li>Bu alanda haftada bir bulgu adayı çıkarabilir miyim?</li>
+            <li>“En az 2 öneri” şartını hangi alan doğal olarak besler?</li>
+          </ol>
+        </li>
+        <li>Liderahenk: En az 2 sanal makine (ideali 3) ve ana makinede 16 GB RAM öneriliyor. Seçilirse laboratuvarı Özgür kurabilir.</li>
+        <li>ETAP: Kalıp giriş yapmadan indirilebiliyor, ama kurulum otomatik ve diski siliyor. Bu yüzden yalnız sanal makinede denenir.</li>
+        <li>Pil ya da kablosuz donanım gibi işler sanal makinede denenemez; onlar için gerçek bir bilgisayar gerekir.</li>
+        <li>Bir alanda bulgu tükenirse süre koyup alan değiştirmek meşru. 2023 üçüncüsü masaüstünde yeterli hata bulamayınca alt projelere geçti.</li>
+        <li>Hangi uygulamaya yükleneceğimiz bu sayfaya yazılmaz, takımın içinde kalır.</li>
+        <li>Sor: “Hangi alanda bir ay sıkılmadan çalışabilirsin?”</li>
+        <li>Süre: 1 dk; asıl konuşma tartışmada.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 10 — Yol haritası ve ritim. Tahmini pencere repodaki sabitlerle aynı (15.03–31.07.2027); şartname çıkınca güncellenecek. -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="10 / 11: Yol haritası ve ritim">
+    <div class="metin">
+      <p class="ust-baslik">10 — Yol haritası ve ritim</p>
+      <h2>Küçük ama her hafta</h2>
+      <p>2027 şartnamesi henüz yok. 2026 düzenine göre tahmin: başvuru Şubat sonunda kapanır, talep penceresi Mart ortasından Temmuz sonuna kadar açık kalır.</p>
+      <ul class="duz">
+        <li><strong>0</strong> · Ekim sonu–Kasım · Kuruluş</li>
+        <li><strong>1</strong> · Kasım–Aralık · Antrenman: rapor yazmayı öğrenmek</li>
+        <li><strong>2</strong> · Ocak–Şubat · Başvuru ve sınavlar: bakım modu</li>
+        <li><strong>3</strong> · Şubat–Mart · Derinleşme: en iyi adayları kaynak koduna kadar kazmak</li>
+        <li><strong>4</strong> · Mart–Nisan · Talep atağı: güncel sürümde yeniden doğrulayıp göndermek</li>
+        <li><strong>5</strong> · Mayıs–Temmuz · Tamamlama: en iyi 3 talebi güçlendirmek</li>
+      </ul>
+      <p>Her hafta aynı gün ve saatte 45 dakika: pano 5 · herkes bir bulgu gösterir 20 · çapraz doğrulama ataması 10 · haftanın hedefi 10. Çıta kişi başı haftada 1 bulgu adayı, sınav haftalarında yarısı. Ayda bir 2–3 saatlik av gecesi.</p>
+      <p><strong class="vurgu">Panoda kişi sıralaması yok, takım zinciri var.</strong></p>
+    </div>
+    <figure class="gorsel" data-sahne="10">
+      <svg viewBox="0 0 400 400" role="img" aria-label="Ekimden ağustosa altı evreli zaman şeridi, mart ortasından temmuz sonuna tahmini talep penceresi; altta bu hafta eklenecek ilk halkasıyla takım zinciri">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <rect class="s-vurgu" x="200" y="100" width="140" height="56" rx="6" style="opacity:.16"/>
+        <text class="s-soluk s-k12" x="270" y="92">talep penceresi (tahmini)</text>
+        <path class="s-ince" d="M30 145v6M61 145v6M92 145v6M123 145v6M154 145v6M185 145v6M216 145v6M247 145v6M278 145v6M309 145v6M340 145v6M371 145v6"/>
+        <rect class="s-etiket" x="55" y="124" width="35.5" height="14" rx="4"/>
+        <rect class="s-etiket" x="93.5" y="124" width="28" height="14" rx="4"/>
+        <rect class="s-ince s-kesik" x="124.5" y="124" width="40" height="14" rx="4"/>
+        <rect class="s-etiket" x="167.5" y="124" width="31" height="14" rx="4"/>
+        <rect class="s-vurgu" x="201.5" y="124" width="44" height="14" rx="4"/>
+        <rect class="s-yesil" x="248.5" y="124" width="91" height="14" rx="4"/>
+        <text class="s-soluk s-k12" x="144.5" y="116">bakım</text>
+        <g class="s-yazi-kucuk" style="font-size:11.5px"><text x="73" y="164">0</text><text x="107.5" y="164">1</text><text x="144.5" y="164">2</text><text x="183" y="164">3</text><text x="223.5" y="164">4</text><text x="294" y="164">5</text></g>
+        <g class="s-soluk" style="font-size:11px"><text x="45.5" y="182">Eki</text><text x="76.5" y="182">Kas</text><text x="107.5" y="182">Ara</text><text x="138.5" y="182">Oca</text><text x="169.5" y="182">Şub</text><text x="200.5" y="182">Mar</text><text x="231.5" y="182">Nis</text><text x="262.5" y="182">May</text><text x="293.5" y="182">Haz</text><text x="324.5" y="182">Tem</text><text x="355.5" y="182">Ağu</text></g>
+        <path class="s-ihtiyac" style="stroke-width:2" d="M50 100V150"/>
+        <text class="s-yazi-v s-k12" x="50" y="92">bugün</text>
+        <!-- takım zinciri -->
+        <g class="s-ince" style="stroke-dasharray:5 5">
+          <ellipse cx="124" cy="290" rx="24" ry="15"/><ellipse cx="162" cy="290" rx="24" ry="15"/><ellipse cx="200" cy="290" rx="24" ry="15"/>
+          <ellipse cx="238" cy="290" rx="24" ry="15"/><ellipse cx="276" cy="290" rx="24" ry="15"/><ellipse cx="314" cy="290" rx="24" ry="15"/>
+        </g>
+        <ellipse class="s-bos nabiz" cx="86" cy="290" rx="24" ry="15"/>
+        <text class="s-yazi-v s-k12" x="86" y="262">bu hafta</text>
+        <text class="s-soluk" x="200" y="334" style="font-size:12.5px">takım zinciri: her hafta en az bir yeni bulgu</text>
+        <circle class="s-cizgi-ince" cx="262" cy="372" r="9"/>
+        <path class="s-cizgi-ince" d="M262 366v6h4"/>
+        <text class="s-soluk s-k12 s-sol" x="278" y="376">45 dk · aynı gün</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>Talep penceresi yıldan yıla değişti:
+          <ul>
+            <li>2023: 27 Aralık 2022–27 Mart 2023</li>
+            <li>2024: 15 Aralık 2023–23 Haziran 2024</li>
+            <li>2025: 3 Mart–27 Temmuz 2025</li>
+            <li>2026: 16 Mart–31 Temmuz</li>
+          </ul>
+          Şartname çıkınca (tahmin: Aralık sonu–Ocak başı) bu şerit güncellenecek.
+        </li>
+        <li>Pencere içinde ara sürüm çıkabilir: 2026'da Pardus 25.1, 1 Nisan'da çıktı. Pardus 23'ün normal desteği de 1 Haziran 2027'de bitiyor. Bu yüzden her bulgu göndermeden önce en son sürümde yeniden doğrulanır.</li>
+        <li>Takım zinciri, üst üste kaç hafta boyunca her hafta en az bir yeni bulgu girdiğimizi sayar. Pano bunu kendiliğinden gösterir; kişi tablosu bilerek alfabetik sıralı.</li>
+        <li>Neden böyle? Deci ve Ryan'ın öz-belirleme kuramına göre motivasyonu üç şey besler:
+          <ul>
+            <li>Özerklik: Alanı ve yolu siz seçersiniz.</li>
+            <li>Yetkinlik: Küçük ama görünür ilerleme.</li>
+            <li>Aidiyet: Sabit saat, av gecesi, birbirinin bulgusunu doğrulamak.</li>
+          </ul>
+        </li>
+        <li>Ödül takım içinde eşit bölünür; rakip takımın içinde değil, dışarıda.</li>
+        <li>Danışmanın rolü yolu açmak ve soru sormak: laboratuvar, okul izinleri, şartname takibi.</li>
+        <li>Ocak–Şubat bakım modu plana dahil; o dönemde kimse geride kalmış sayılmaz.</li>
+        <li>Sor: “Sınav haftalarınız ne zaman?” Cevapları takvime işle.</li>
+        <li>Süre: 1,5 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 11 — Karar. Takım adını öğrenciler seçer; seçilince üst şerit güncellenir. Staj bilgisi: Pardus gönüllü yazısı, Mart 2024 (niyet, garanti değil). -->
+  <section class="slayt" aria-roledescription="sahne" aria-label="11 / 11: Karar">
+    <div class="metin">
+      <p class="ust-baslik">11 — Karar</p>
+      <h2>Bugün buradan üç kararla çıkıyoruz</h2>
+      <ol>
+        <li><strong>Alan:</strong> Herkes bir ilk tercih söyler. Bir ay sonra değiştirmek serbest.</li>
+        <li><strong>Takım adı:</strong> Sizin bulacağınız, sizin seçeceğiniz bir ad.</li>
+        <li><strong>Sabit saat:</strong> Haftalık 45 dakikanın günü ve saati.</li>
+      </ol>
+      <p>Bu yolculuk sende ne bırakır? Linux'un iç yüzü, git, başkasının kodunu okumak, bir hatayı başkasının tekrarlayabileceği kadar açık anlatmak. Yarışma biter, bunlar sende kalır. Pardus ekibi de katkı veren gönüllülerin staj başvurularına öncelik vermeye özen gösterdiğini yazıyor.</p>
+      <p>Ve bir soru:</p>
+      <p class="soru">Bir yıl sonra Pardus'ta senin sayende düzelmiş olan şey ne olsun?</p>
+    </div>
+    <figure class="gorsel" data-sahne="11">
+      <svg viewBox="0 0 400 400" role="img" aria-label="Açılıştaki ekran ızgarası: birkaç ekranda düzeltildi işareti, bir ekran boş ve soru işaretli; ondan bir öğrenciye inen çizgi ve işaretlenmeyi bekleyen üç karar kutusu: alan, takım adı, saat">
+        <rect class="s-zemin" width="400" height="400" rx="24"/>
+        <g class="s-ince"><rect x="65" y="43" width="46" height="28" rx="3"/><rect x="127" y="44" width="34" height="22" rx="2"/><path d="M123 69h42"/><rect x="177" y="43" width="46" height="28" rx="3"/><rect x="233" y="43" width="46" height="28" rx="3"/><rect x="295" y="44" width="34" height="22" rx="2"/><path d="M291 69h42"/><rect x="71" y="79" width="34" height="22" rx="2"/><path d="M67 104h42"/><rect x="121" y="78" width="46" height="28" rx="3"/><rect x="177" y="78" width="46" height="28" rx="3"/><rect x="239" y="79" width="34" height="22" rx="2"/><path d="M235 104h42"/><rect x="289" y="78" width="46" height="28" rx="3"/><rect x="65" y="113" width="46" height="28" rx="3"/><rect x="121" y="113" width="46" height="28" rx="3"/><rect x="183" y="114" width="34" height="22" rx="2"/><path d="M179 139h42"/><rect x="233" y="113" width="46" height="28" rx="3"/><rect x="295" y="114" width="34" height="22" rx="2"/><path d="M291 139h42"/><rect x="71" y="149" width="34" height="22" rx="2"/><path d="M67 174h42"/><rect x="121" y="148" width="46" height="28" rx="3"/><rect x="239" y="149" width="34" height="22" rx="2"/><path d="M235 174h42"/><rect x="289" y="148" width="46" height="28" rx="3"/></g>
+        <path class="s-yardim" style="stroke-width:3" d="M193 57l5 5 9-10M193 92l5 5 9-10M305 92l5 5 9-10M81 127l5 5 9-10M249 127l5 5 9-10M305 162l5 5 9-10"/>
+        <rect class="s-bos" x="177" y="148" width="46" height="28" rx="3"/>
+        <text class="s-yazi-v nabiz" x="200" y="170" style="font-size:22px">?</text>
+        <path class="s-ihtiyac" style="stroke-width:3;stroke-dasharray:5 5" d="M200 180V214"/>
+        <circle class="s-kisi" cx="200" cy="232" r="14"/>
+        <path class="s-kisi" d="M174 300v-22q0-20 26-20t26 20v22z"/>
+        <text class="s-yazi-v" x="200" y="322">senin</text>
+        <rect class="s-cizgi-ince" x="64" y="338" width="16" height="16" rx="3"/>
+        <text class="s-yazi-kucuk s-sol" x="88" y="351">alan</text>
+        <rect class="s-cizgi-ince" x="160" y="338" width="16" height="16" rx="3"/>
+        <text class="s-yazi-kucuk s-sol" x="184" y="351">takım adı</text>
+        <rect class="s-cizgi-ince" x="276" y="338" width="16" height="16" rx="3"/>
+        <text class="s-yazi-kucuk s-sol" x="300" y="351">saat</text>
+        <text class="s-soluk" x="200" y="384">sıradaki düzeltme</text>
+      </svg>
+    </figure>
+    <aside class="not">
+      <b>Anlatıcı notu</b>
+      <ul>
+        <li>İlk sahnedeki ekranlara dön. Soruyu sor ve sessizliğe izin ver; gelen cevaplar alan seçiminin girişi olur.</li>
+        <li>Sonra tartışmayı aç ve üç kararı sırayla al, tahtaya yaz.</li>
+        <li>Alan için önce herkes kendi tercihini söylesin, sonra konuşun. Böylece ilk konuşan diğerini etkilemez.</li>
+        <li>Takım adını öğrenciler seçer; sen ad önerme.</li>
+        <li>Staj bilgisi Pardus'un Mart 2024 tarihli gönüllü yazısından geliyor. Bir niyet ifadesi, garanti değil.</li>
+        <li>Hatırlat: Bu sayfa herkese açık. İçinde bulgu yok ve olmayacak; bulgular takımın private reposunda kalır.</li>
+        <li>Toplantı 60 dk; sunumdan sonra yaklaşık 45 dk karar ve tartışmaya kalıyor.</li>
+        <li>Süre: 1 dk.</li>
+      </ul>
+    </aside>
+  </section>
+
+</main>
+
+<div class="ilerleme" aria-hidden="true"><span></span></div>
+<footer class="alt">
+  <button id="geri" type="button" aria-label="Önceki sahne">←</button>
+  <span id="sayac" aria-live="polite">01 / 11</span>
+  <button id="ileri" type="button" aria-label="Sonraki sahne">→</button>
+  <p class="resmi">Takımın kendi hazırlık sunumudur; TEKNOFEST, TÜBİTAK ya da Pardus'un resmî sayfası değildir.</p>
+  <span class="ipucu">← → tuşları ya da kaydırma</span>
+  <button id="indir" type="button">Görseli indir</button>
+</footer>
+
+<script>
+(() => {
+  const slaytlar = [...document.querySelectorAll('.slayt')];
+  const N = slaytlar.length;
+  const $ = id => document.getElementById(id);
+  const geri = $('geri'), ileri = $('ileri'), sayac = $('sayac');
+  const bar = document.querySelector('.ilerleme span');
+  const iki = n => String(n).padStart(2, '0');
+  let i = 0;
+
+  function git(n) {
+    i = Math.max(0, Math.min(N - 1, n));
+    slaytlar.forEach((s, k) => {
+      const aktif = k === i;
+      s.classList.toggle('aktif', aktif);
+      s.setAttribute('aria-hidden', aktif ? 'false' : 'true');
+      s.inert = !aktif;
+    });
+    slaytlar[i].scrollTop = 0;
+    sayac.textContent = iki(i + 1) + ' / ' + iki(N);
+    bar.style.width = ((i + 1) / N * 100) + '%';
+    geri.disabled = i === 0;
+    ileri.disabled = i === N - 1;
+    try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) {}
+  }
+  const hashtan = () => parseInt(location.hash.slice(1), 10) - 1;
+
+  geri.onclick = () => git(i - 1);
+  ileri.onclick = () => git(i + 1);
+  window.addEventListener('hashchange', () => { const h = hashtan(); if (h >= 0 && h !== i) git(h); });
+
+  // Hareketi durdur: hareket azaltma tercihi olanlarda sayfa baştan durgun açılır.
+  const hareket = $('hareket');
+  function durgun(d) {
+    document.body.classList.toggle('durgun', d);
+    hareket.setAttribute('aria-pressed', String(d));
+    hareket.textContent = d ? 'Hareketi başlat ▶' : 'Hareketi durdur Ⅱ';
+  }
+  hareket.onclick = () => durgun(!document.body.classList.contains('durgun'));
+  durgun(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  const notlar = $('notlar');
+  function notAc() {
+    const acik = document.body.classList.toggle('notlar-acik');
+    notlar.setAttribute('aria-pressed', String(acik));
+  }
+  notlar.onclick = notAc;
+
+  const tamekran = $('tamekran');
+  if (!document.fullscreenEnabled) tamekran.hidden = true;
+  function tamEkran() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(() => {});
+  }
+  tamekran.onclick = tamEkran;
+  document.addEventListener('fullscreenchange', () =>
+    tamekran.setAttribute('aria-pressed', String(!!document.fullscreenElement)));
+
+  document.addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const dugmede = e.target.closest && e.target.closest('button,a');
+    switch (e.key) {
+      case 'ArrowRight': case 'PageDown': git(i + 1); break;
+      case 'ArrowLeft': case 'PageUp': git(i - 1); break;
+      case ' ': if (dugmede) return; git(e.shiftKey ? i - 1 : i + 1); break;
+      case 'Home': git(0); break;
+      case 'End': git(N - 1); break;
+      case 'n': case 'N': notAc(); break;
+      case 'f': case 'F': if (!tamekran.hidden) tamEkran(); break;
+      default: return;
+    }
+    e.preventDefault();
+  });
+
+  // Dokunmatik kaydırma
+  let x0 = null, y0 = null;
+  const sahne = $('sahne');
+  sahne.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  sahne.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) git(dx < 0 ? i + 1 : i - 1);
+    x0 = y0 = null;
+  }, { passive: true });
+
+  // Görseli indir: o sahnenin çizimini, stilleriyle birlikte tek başına açılan bir SVG dosyası olarak indirir.
+  $('indir').onclick = () => {
+    const fig = slaytlar[i].querySelector('.gorsel');
+    const svg = fig.querySelector('svg').cloneNode(true);
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.setAttribute('width', '1200');
+    svg.setAttribute('height', '1200');
+    const stil = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    stil.textContent = $('svg-stil').textContent;
+    svg.insertBefore(stil, svg.firstChild);
+    const blob = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'hata-avi-sahne-' + fig.dataset.sahne + '.svg';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+
+  const h = hashtan();
+  git(h >= 0 ? h : 0);
+})();
+</script>
+</body>
+</html>
