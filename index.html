@@ -61,6 +61,8 @@ main{position:relative; flex:1; min-height:0}
 .metin code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace; font-size:.9em; color:var(--accent);
   background:var(--bg2); border:1px solid var(--line); border-radius:6px; padding:0 .3em; white-space:nowrap}
 .metin .alinti{border-left:3px solid var(--green); padding-left:14px; color:var(--muted)}
+.metin .kutu{display:grid; gap:6px; margin:0 0 10px; padding:10px 14px; background:var(--bg2); border:1px solid var(--line); border-radius:12px}
+.metin .kutu p{margin:0; font-size:clamp(14px,1.05vw,15.5px); line-height:1.45}
 .metin .alinti strong{color:var(--green)}
 .metin .soru{font-size:clamp(19px,1.7vw,24px); line-height:1.35; color:var(--accent); font-weight:650; margin-top:4px}
 .vurgu{color:var(--accent)}
@@ -300,6 +302,7 @@ body.durgun .slayt,body.durgun .ilerleme span{transition:none}
       <ul>
         <li>Herhangi bir Pardus uygulamasında tek bir şey bul; bir yazım hatası bile olur. <code>/bulgu</code> ile kaydet.</li>
         <li>Emir, Hakkı'nın bulgusunu; Hakkı, Emir'in bulgusunu <code>/dogrula</code> ile tekrarlar.</li>
+        <li><strong>İyi raporun parçaları:</strong> numaralı adımlar (en az 2), beklenen ve gerçekleşen davranış, ekran görüntüsü. Video repoya girmez; videodan alınan kare girer.</li>
       </ul>
       <p><strong>2. toplantı:</strong> Herkes kendi bulgusunu canlı gösterir.</p>
     </div>
@@ -354,6 +357,7 @@ body.durgun .slayt,body.durgun .ilerleme span{transition:none}
         <li>Sanallaştırma: Windows'ta VirtualBox; Linux'ta KVM/virt-manager ya da GNOME Boxes.</li>
         <li>Snapshot neden önemli: Pardus ekibi hatayı temiz bir kurulumda deneyecek. Bu yüzden yeniden üretme her zaman araç kurulmamış, temiz snapshot'ta yapılır.</li>
         <li>İlk bulgu bilerek küçük tutuluyor. Amaç ilk turu bitirmek ve ilk başarıyı erken görmek.</li>
+        <li>Rapor parçaları takımın rapor şablonundan: numaralı adımlar, beklenen / gerçekleşen, ekran görüntüsü. Video yerine kare kuralı takım kararı (22.10.2026).</li>
         <li>Kurulumda takılmak normal, sessiz kalmak sorun. Takılan beklemeden Özgür'e yazsın.</li>
         <li>Özgür de döngüyü bir kez gösterebilir. Danışmanın kaydı eğitim amaçlıdır, talebe dönüşmez.</li>
         <li>Sor: “Sanal makine mi, boş bir bilgisayar mı? Kimin elinde ne var?”</li>
@@ -373,6 +377,10 @@ body.durgun .slayt,body.durgun .ilerleme span{transition:none}
         <li><strong>Geliştirme:</strong> Kod zorunlu. Yeni yazılım herkese açık bir repoda paylaşılır. Mevcut bir Pardus uygulamasına yapılan iyileştirme github.com/pardus'a PR olarak gönderilir.</li>
       </ul>
       <p><strong>2026 kuralı:</strong> Kategori başına en fazla 10 talep girilir; Öneri/Hata'da bunların en az 2'si öneri olmalı. Puana yalnız en yüksek puanlı 3 talep girer. Puanlama önemi, türü ve rapor kalitesini tartar.</p>
+      <div class="kutu">
+        <p><strong>Hata:</strong> uygulama yapması gerekeni yapmıyor ya da yanlış yapıyor. Rapor “beklenen / gerçekleşen” diye yazılır. Örnek: Kaydet butonuna basınca dosya kaydedilmiyor.</p>
+        <p><strong>Öneri:</strong> uygulama çalışıyor ama daha iyi olabilir: gereksiz uzun iş, kafa karıştıran adım, eksik özellik. Rapor “ne öneriyorum, neden gerekli” diye yazılır. Örnek: üç pencereden geçerek yapılan ayar tek butonla yapılabilir.</p>
+      </div>
       <p>Pardus ekibinin yeniden üretemediği hata değerlendirmeye alınmaz. Döngüdeki “arkadaşın tekrarlasın” adımı bu yüzden var.</p>
       <p class="alinti"><strong>Pardus ekibi, 2021:</strong> “Hatanın eksiksiz tanımı, ekran görüntüsü olarak sunumu, çözümü ya da çözüm önerisinin belirtilmiş olması fark yarattı.”</p>
     </div>
@@ -410,7 +418,8 @@ body.durgun .slayt,body.durgun .ilerleme span{transition:none}
     <aside class="not">
       <b>Anlatıcı notu</b>
       <ul>
-        <li>2027 şartnamesi 20.10.2026 itibarıyla çıkmadı. Kurallar 2026 metnine göre; şartname çıkınca bu sahne güncellenecek.</li>
+        <li>2027 şartnamesi 22.10.2026 itibarıyla çıkmadı. Kurallar 2026 metnine göre; şartname çıkınca bu sahne güncellenecek.</li>
+        <li>Hata / öneri kutusu: takımın rapor şablonundaki “nitelik” alanı (hata | öneri) ve av rehberindeki “duraksadığın yer bir öneri olur” kuralı. Örnekler geneldir, takımın bulgusu değildir.</li>
         <li>Sor: “Elimizde 10 orta bulgu mu olsun, 3 güçlü bulgu mu?” Cevabı kuralla bağla: 10 orta bulgu, puanda 3 orta bulgu kadar eder.</li>
         <li>Çizili kartı göster: En parlak bulgu bile Pardus ekibi tekrarlayamazsa sıfır sayılır.</li>
         <li>Açık soru: 10 talep sınırı kişi başına mı, takım başına mı?
@@ -809,6 +818,7 @@ body.durgun .slayt,body.durgun .ilerleme span{transition:none}
         <li><strong>5</strong> · Mayıs–Temmuz · Tamamlama: en iyi 3 talebi güçlendirmek</li>
       </ul>
       <p>Her hafta aynı gün ve saatte 45 dakika: pano 5 · herkes bir bulgu gösterir 20 · çapraz doğrulama ataması 10 · haftanın hedefi 10. Çıta kişi başı haftada 1 bulgu adayı, sınav haftalarında yarısı. Ayda bir 2–3 saatlik av gecesi.</p>
+      <p>Görevler tek bir tabloda durur: her görevin sabit bir numarası, bir sahibi ve bir durumu (açık, bekliyor, bitti) vardır. Biten görevi sahibi o tabloda işaretler.</p>
       <p><strong class="vurgu">Panoda kişi sıralaması yok, takım zinciri var.</strong></p>
     </div>
     <figure class="gorsel" data-sahne="10">
